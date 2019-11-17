@@ -8,7 +8,7 @@
 #include "mainApp.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "sx1276_7_8.h"
+#include "Lora_transmission_HAL.h"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "string.h"

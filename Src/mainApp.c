@@ -9,18 +9,15 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "Lora_transmission_HAL.h"
-#include "usb_device.h"
-#include "usbd_cdc_if.h"
 #include "string.h"
-#define printUSB(x) CDC_Transmit_FS((uint8_t*)x,strlen((char*)x))
+#include "logging.h"
+#include "SW_Timer.h"
 
 uint32_t count =0 ;
-uint32_t clk_count =0 ;
-uint32_t clk_count1 = 0;
 
 char strBuf[64];
 char strBuf1[64];
-char strBuf_1[64];
+u8 strBuf_1[64] = "\n";
 u8 testx[64];
 u16 SysTime;
 u16 time2_count;
@@ -41,14 +38,9 @@ u8	operation_flag;
 u8 key_flag;
 
 
-
-
-
-
-
 void mainApp()
 {
-	u16 i=0;//,j,k=0,g;
+	//u16 i=0;//,j,k=0,g;
 
 	SysTime = 0;
 	operation_flag = 0x00;
@@ -62,37 +54,63 @@ void mainApp()
 												//0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09
 	Fsk_Rate_Sel = 0x00;
 
-	RED_LED_L();
-	HAL_Delay(5000);
-	RED_LED_H();
-
-	HAL_GPIO_WritePin(Reset_GPIO_Port,Reset_Pin,GPIO_PIN_RESET);
-	HAL_Delay(10);
-	HAL_GPIO_WritePin(Reset_GPIO_Port,Reset_Pin,GPIO_PIN_SET);
-
-	sx1276_7_8_Config();//
+	Reset_LoraModule();
+	sx1276_7_8_Config_Init();
 	sx1276_7_8_LoRaEntryRx();
-	key1_count = 5;
-
-
+        
+       /* SW_TIMER_CALLBACK func1;
+        func1 = fun1;
+        SW_TIMER_CREATE_FunCallBack(SW_TIMER1,1000,func1);
+        SW_TIMER_START(SW_TIMER1);
+        */
+	key1_count = 0;
+	u8 RData[64];
+        u16 s = 0;
+        u16 e = 0;
 	while (1)
 	{
 		switch(key1_count)
 		{
-			case 0://lora master Tx	
-
-			break;
-			case 1://lora slaver Rx countinous
-	
-			break;
-			case 2: //lora slaver Rx single
-
-			break;
-			case 3: // packet return from RX 
-
-			break;
-			case 5:
+			case 0://lora Tx	
+				sprintf((char*) Txdata, "2x_back");
+				s = timer_measure_start();
+				sx1276_7_8_LoRaEntryTx();
+				Send_Tx_Packet();
+				Wait_Tx_Done();
+				e = timer_measure_stop();
+				sprintf(strBuf1,"Tx_sent_%d",e-s);
+				print_data(strBuf1,strlen(strBuf1));
+			
+				//rs = timer_measure_start();
+				sx1276_7_8_LoRaEntryRx();
+				key1_count =0;
 				
+			break;
+			case 1://lora Rx countinous
+				/*if( sx1276_7_8_LoRaRxPacket())
+					{
+						re = timer_measure_stop();
+						if( strncmp( (char*) RxData, "2", 1)==0)
+						{
+							sprintf(strBuf,"Rx_%s",(char*) RxData);
+							print_data(strBuf,strlen(strBuf));
+							
+							//key1_count = 0;
+						}
+					}*/
+				if(Indicate_Rx_Comming())
+				{
+					u8 packet;
+					packet = Read_packet();
+					sprintf(strBuf,"Rx_%s_%d",(char*) RxData,packet);
+					print_data(strBuf,strlen(strBuf));
+					key1_count = 0;
+				}
+			break;
+			case 2: //lora Rx single
+
+			break;
+			case 3:
 			break;
 			default:
 				

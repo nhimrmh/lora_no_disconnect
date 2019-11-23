@@ -81,7 +81,7 @@
 #define LR_RegMaxPayloadLength                      0x23
 #define LR_RegHopPeriod                             0x24
 #define LR_RegFifoRxByteAddr                        0x25
-#define LR_RegInvertIQ								0x33
+#define LR_RegInvertIQ															0x33
 // I/O settings
 #define REG_LR_DIOMAPPING1                          0x40
 #define REG_LR_DIOMAPPING2                          0x41
@@ -111,17 +111,23 @@ extern u8 Fsk_Rate_Sel;
 extern u16 SysTime;
 extern u8 Txdata[64];
 extern u8 RxAddr;
+extern u8 status;
 extern void delay_ms(unsigned int ms);
 extern void delay_us(unsigned int us);
 
 
 extern u8 RxData[64];
 extern uint32_t t1,t2;
-extern void sx1276_7_8_Config(void);
+extern void sx1276_7_8_Config_Init(void);
+extern void sx1276_7_8_Config_Init_2(void);
+extern void Reset_LoraModule(void);
 extern void LR_invertIQ(u8 invert);
+extern u8 Indicate_Rx_Comming(void);
+extern u8 Send_Tx_Packet(void);
+extern void Wait_Tx_Done(void);
 extern u8 sx1276_7_8_LoRaEntryRx_single(void);
 extern u8 sx1276_7_8_LoRaEntryRx(void);
-extern u8 sx1276_7_8_LoRaReadRSSI(void); // old
+extern u8 Read_packet(void);
 extern s8 sx1276_7_8_LoRaReadRSSI_test(void);
 extern s8 sx1276_7_8_LoRaReadRSSI_Rx(void);
 extern s8 sx1276_7_8_LoRaReadSNR(void);

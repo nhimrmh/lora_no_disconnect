@@ -57,9 +57,7 @@ typedef volatile unsigned long  const vuc32;  /* Read Only */
 typedef volatile unsigned short const vuc16;  /* Read Only */
 typedef volatile unsigned char  const vuc8;   /* Read Only */
 
-//BoolT
-#define FALSE  0
-#define TRUE   !FALSE
+typedef enum {FALSE = 0, TRUE = !FALSE} bool;
 
 /*FlagStatus, ITStatus, BitStatus*/
 #define RESET  0

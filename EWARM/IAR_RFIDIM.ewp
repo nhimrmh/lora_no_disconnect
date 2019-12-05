@@ -207,7 +207,7 @@
                 <option>
                     <name>TrustZoneModes</name>
                     <version>0</version>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
             </data>
         </settings>
@@ -1064,6 +1064,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Src\mainApp.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\Master.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\Slave.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Src\spi.c</name>

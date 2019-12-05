@@ -2,41 +2,35 @@
 #include "usbd_cdc_if.h"
 #include "My_type.h"
 #include "logging.h"
+#include "SW_Timer.h"
+TxPacket myTxPacket;
+LoraPtr myLoraPtr;
 
-extern TIM_HandleTypeDef htim2; 
+void print_data( char * x, u16 lenx)
+{
+  u8 y[64];
+	u8 k[64];
+	sprintf((char*)k, "%d:",HAL_GetTick());
+	sprintf((char*)y, "%d:%s\n",HAL_GetTick(),x);
+	u16 lenk = strlen((char*)k);
+	u16 leng = lenk + lenx +1 ;
+	CDC_Transmit_FS((uint8_t*)y,(uint16_t)leng);
+}
 
-/**
-  * @brief  	Data send over USB with format "numTick:Data\n"
-  * @param  	data, length of data you want to transmit
-  * @retval 	None
-  */
-void print_data(char* data, u8 len_transmit)
+u16 timer_measure_start(void)
 {
-        char packet_transmit[64]; // 11+1+48+1 = 61
-        char data_transmit[48];
-        strncpy(data_transmit,data,len_transmit);	 // coppy len_transmit characters from data to data_transmit
-        data_transmit[len_transmit] = '\0';				// gan ky tu null cho vi tri cuoi cua data_transmit
-        sprintf((char*)packet_transmit,"%d:%s\n",HAL_GetTick(),data_transmit);  
-        CDC_Transmit_FS((uint8_t*)packet_transmit,strlen((char*)packet_transmit)); 
+	u16 time_start =0;
+	time_start = HAL_GetTick();
+	return time_start;
 }
-/**
-  * @brief  	Start Timer 2
-  * @param  	None
-  * @retval 	None
-  */
-void timer_measure_start(void)
-{
-	HAL_TIM_Base_Start_IT(&htim2);
-}
-/**
-  * @brief  	Stop Timer 2
-  * @param  	None
-  * @retval 	counter in us
-  */
+
 u16 timer_measure_stop(void)
 {
-	HAL_TIM_Base_Stop_IT(&htim2);
-        u16 count = __HAL_TIM_GET_COUNTER(&htim2);  
-        __HAL_TIM_SET_COUNTER(&htim2,0);
-        return count;
+	u16 time_stop =0;
+	time_stop = HAL_GetTick();
+	return time_stop;
+}
+
+void HAL_SYSTICK_Callback(void){
+        SW_TIMER_ISR();
 }

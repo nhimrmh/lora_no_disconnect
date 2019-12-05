@@ -1,3 +1,10 @@
+/*
+ * sx1276_7_8.h
+ *
+ *  Created on: Sep 8, 2017
+ *      Author: dkhairnar
+ */
+
 #ifndef SX1276_7_8_H_
 #define SX1276_7_8_H_
 
@@ -9,6 +16,14 @@
 /*****************IO define********************/
 #define RED_LED_H()					HAL_GPIO_WritePin(RED_LED_GPIO_Port,RED_LED_Pin,GPIO_PIN_SET)//PD_ODR |= 0x40//PD6
 #define RED_LED_L()					HAL_GPIO_WritePin(RED_LED_GPIO_Port,RED_LED_Pin,GPIO_PIN_RESET)//PD_ODR &= 0xbf
+
+#define MAX_QUEUE_LENGTH 3
+#define BROADCAST_CHARACTER "a"
+#define SLAVE_IS_RECEIVING 1
+#define MASTER_IS_RECEIVING 0
+#define printUSB(x) CDC_Transmit_FS((uint8_t*)x,strlen((char*)x))
+///////////////////////////////////////////////// LoRa mode //////////////////////////////////////////////////
+
 
 //SX1278 Internal registers Address
 /********************Lora Registers***************************/
@@ -74,7 +89,7 @@
 // Lora mode
 #define LORA_ON                                            0x88
 #define LORA_SLEEP                                         0x08
-#define LORA_STDBY                                         0x89
+#define LORA_STDBY                                         0x09
 #define LORA_FSTX                                          0x8A
 #define LORA_TX                                            0x8B
 #define LORA_FSRX                                          0x8C
@@ -146,7 +161,7 @@ static const u8 SX1278_Frequency[1][3] =
 #define DETECTION_THRESHOLD_SF7_12                         0x0A                 // Reg default
 // Lora Preamble Length
 #define PREAMBLE_MSB                                       0x00                 // Preamble MSB = PREAMBLE_MSB + 4.25
-#define PREAMBLE_LSB                                       0x08   
+#define PREAMBLE_LSB                                       12   
 // Lora DioMapping2 Mode DIO5 and DIO4
 #define DIOMAPPING2_MODE                                   0x01                 // RegDioMapping2 DIO5=00, DIO4=01
 // Lora DioMapping1 Mode DIO3,DIO2,DIO1,DIO0
@@ -192,23 +207,36 @@ typedef struct
   Lora_RxTimeOut        RxTimeOut;
   Lora_Status           status;
 }Lora_HandleTypeDef;
-//command
-/*********************************************************/
-extern u8 Txdata[64];
-extern u8 RxData[64];
-extern Lora_HandleTypeDef Lora;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+extern u8 temp;
+extern u8 mode;
+extern u8 Freq_Sel;
+extern u8 Power_Sel;
+extern u8 Lora_Rate_Sel;
+extern u8 BandWide_Sel;
+extern u8 Fsk_Rate_Sel;
+extern u16 SysTime;
+extern void delay_ms(unsigned int ms);
+extern void delay_us(unsigned int us);
+extern u8 result;
+extern u8 free_ptr;
 
-extern u8 sx1276_7_8_LoRaEntryRx(void);
-extern u8 Indicate_Rx_Comming(void);
-extern u8 Read_packet(void);
-extern u8 sx1276_7_8_LoRaEntryTx(void);
-extern bool Send_Tx_Packet(u8* buf, u8 length);
-extern void Wait_Tx_Done(void);
+extern u8 Wait_Tx_Done();
+extern void sx1276_7_8_Reset(void);
 extern void sx1276_7_8_Config_Init(void);
-extern void Lora_1278_BaseParameter(void);
-extern void Reset_LoraModule(void);
-extern void LR_invertIQ(bool invert);
-extern s8 sx1276_7_8_LoRaReadRSSI_Rx(void);
-extern s8 sx1276_7_8_LoRaReadSNR(void);
-extern void sx1276_7_8_Standby(void);    
+extern void sx1276_7_8_Config_clk(void);
+
+extern Bool Switch_To_Tx(void);
+extern Bool Switch_To_Rx(void);
+extern void Switch_To_Standby();
+
+extern u8 sx1276_7_8Data[20];
+extern u8 RxData[3][20];
+extern Bool Send_Tx_Packet(u8* buf, u8 length);
+extern u8 Indicate_Rx_Packet(char* slave_id, u8 m_or_s);
+extern Bool Read_Rx_Packet(char* Rx_Packet, u8 length, char* slave_id, u8 m_or_s);
+
+extern s8 sx1276_7_8_LoRaReadRSSI(void);
+extern Lora_HandleTypeDef Lora;
+extern void Lora_1278_Init(void);
 #endif /* SX1276_7_8_H_ */

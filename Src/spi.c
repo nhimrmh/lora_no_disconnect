@@ -20,7 +20,7 @@
 void SPICmd8bit(u8 WrPara)
 {
 	NSS_L();
-  HAL_SPI_Transmit(&hspi1,&WrPara,sizeof(WrPara),100);
+  HAL_SPI_Transmit(&hspi1,&WrPara,sizeof(WrPara),10);
 
 }
 
@@ -35,7 +35,7 @@ u8 SPIRead8bit(void)
 {
  u8 RdPara = 0;
  NSS_L();                                          
- HAL_SPI_Receive(&hspi1,&RdPara,sizeof(RdPara),100);
+ HAL_SPI_Receive(&hspi1,&RdPara,sizeof(RdPara),10);
 
   return(RdPara);
 }

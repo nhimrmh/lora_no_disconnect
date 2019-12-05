@@ -57,22 +57,9 @@ typedef volatile unsigned long  const vuc32;  /* Read Only */
 typedef volatile unsigned short const vuc16;  /* Read Only */
 typedef volatile unsigned char  const vuc8;   /* Read Only */
 
-typedef enum {FALSE = 0, TRUE = !FALSE} bool;
-
-/*FlagStatus, ITStatus, BitStatus*/
-#define RESET  0
-#define SET    !RESET
-
-/*FunctionalState */
-#define  DISABLE  0
-#define  ENABLE   !DISABLE
-
+typedef enum {FALSE = 0, TRUE = !FALSE} Bool; 
 
 #define IS_FUNCTIONALSTATE_OK(VALUE) ( (VALUE == ENABLE) || (VALUE == DISABLE) )
-
-/*ErrorStatus*/
-#define  ERROR   0
-#define  SUCCESS !ERROR
 
 #define U8_MAX     ((u8)255)
 #define S8_MAX     ((s8)127)

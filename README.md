@@ -10,3 +10,4 @@
 - Master.c
 - Slave.c
 - new type Bool
+- remove test.c

@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\Users\Keima\Desktop\Pull_new\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" --backend -f "C:\Users\Keima\Desktop\Pull_new\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "D:\Lora\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" --backend -f "D:\Lora\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
 }
 else
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\Users\Keima\Desktop\Pull_new\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Keima\Desktop\Pull_new\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "D:\Lora\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" --debug_file=$debugfile --backend -f "D:\Lora\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
 }

@@ -152,19 +152,18 @@ void Send_Unicast_Data_Test(){
 
 void Master_Send_Data(){
   if(strncmp((char*)received_USB,"broad",5) == 0){
-    for(u8 i = 0; i <8 ; i++){
+    /*for(u8 i = 0; i <8 ; i++){
         received_USB[i] = 0;
-    }
-    _index  = 0;
+    }*/
     Send_Broadcast_Data("abb");
   }
   else if(strncmp((char*)received_USB,"1",1) == 0 || strncmp((char*)received_USB,"2",1) == 0 
           || strncmp((char*)received_USB,"3",1) == 0 || strncmp((char*)received_USB,"4",1) == 0){
     if(myLoraMaster.sent == NOT_SENT_YET){
-      _index  = 0;
       Send_Unicast_Data();
     }
-  }      
+  } 
+  _index  = 0;
 }
 
 void Master_Send_Data_Test(){
@@ -241,6 +240,7 @@ void Master_Receive_Data(){
     }
     else{       
       SW_TIMER_CLEAR(SW_TIMER1);
+      //myLoraMaster.uni_received = 1;
       myLoraMaster.sent = 0;
       myLoraMode.mode = 3;
     }

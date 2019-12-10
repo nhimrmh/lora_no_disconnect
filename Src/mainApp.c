@@ -33,8 +33,8 @@ void mainApp()
         /*
 	Choose mode
 	*/ 
-        myLoraSlave.slave_id = "2"; //Id of slave
-	myLoraMode.mode = MASTER_TX; //Mode 1: Slave, 3:Master  
+        myLoraSlave.slave_id = "3"; //Id of slave
+	myLoraMode.mode = SLAVE_RX; //Mode 1: Slave, 3:Master  
         myLoraMode.uni_or_broad = UNICAST;
 	myLoraMode.slave_count = RESET_VALUE;
         myLoraPtr.current_ptr = RESET_VALUE;

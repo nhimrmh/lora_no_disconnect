@@ -127,6 +127,7 @@ void fun1(void)
   }
   else{
     if(myLoraMaster.uni_sent == 0){
+      myLoraMaster.sent = 0;
       myLoraMode.mode = 6;
     }
     else{

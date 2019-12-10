@@ -89,6 +89,7 @@ void sx1276_7_8_LoRaClearIrq(void)
 **********************************************************/
 Bool Switch_To_Rx(void)
 {
+  timer_measure_start();
   Bool switch_success = FALSE;
   u8 addr;  
 	
@@ -108,9 +109,11 @@ Bool Switch_To_Rx(void)
   {
     if((SPIRead(Lora_1278_RegModemStat)&0x04)==0x04){   //Rx-on going RegModemStat
       switch_success = TRUE;
+      LoraTime.status = RXSTARTDONE;
       break;		                         
     }
   }
+  LoraTime.timeRxconf = timer_measure_stop();
   return switch_success;
 }
 
@@ -144,17 +147,17 @@ s8 sx1276_7_8_LoRaReadRSSI(void)
 **********************************************************/
 u8 Indicate_Rx_Packet(char* slave_id, u8 m_or_s)
 {
-  //Bool receive_success = FALSE;
+  
   u8 i, result;
   if(HAL_GPIO_ReadPin(nIrq_GPIO_Port,nIrq_Pin) == 1)
   {	
-    //Bool switch_success = FALSE;
+    
     for(i=0;i<19;i++){     
             RxData[free_ptr][i] = 0;
     }
     result = Read_Rx_Packet((char*)RxData, 20, slave_id, m_or_s);
-    sx1276_7_8_LoRaClearIrq();		
-    //receive_success = TRUE;
+    sx1276_7_8_LoRaClearIrq();	
+    LoraTime.status = GETACK;  
   }  
   return result;
 }
@@ -210,6 +213,7 @@ Bool Read_Rx_Packet(char* Rx_Packet, u8 length, char* slave_id, u8 m_or_s){
 **********************************************************/
 Bool Switch_To_Tx(void)
 {
+  timer_measure_start();
   Bool switch_success = FALSE;
   u8 addr,temp;
   
@@ -223,15 +227,18 @@ Bool Switch_To_Tx(void)
 
   addr = SPIRead(Lora_1278_RegFifoTxBaseAddr);           //RegFiFoTxBaseAddr
   SPIWrite(Lora_1278_RegFifoAddrPtr,addr);                        //RegFifoAddrPtr
+  
   while(1)
   {
     temp = SPIRead(Lora_1278_RegPayloadLength);
     if(temp == 20)
     {
       switch_success = TRUE;
+      LoraTime.status = TXSTARTDONE;
       break;
     }
   }
+  LoraTime.timeTxconf = timer_measure_stop();
   return switch_success;
 }
 /**********************************************************
@@ -242,12 +249,17 @@ Bool Switch_To_Tx(void)
 **********************************************************/
 Bool Send_Tx_Packet(u8* buf, u8 length)
 {
+  timer_measure_start();
   Bool switch_success = FALSE;
-  if(strlen((char*)buf) <= length){
-          BurstWrite(Lora_1278_RegFifo, buf, length);
-          SPIWrite(Lora_1278_RegOpMode,LORA_TX);                    //Tx Mode
-          Wait_Tx_Done();
-          switch_success = TRUE;
+  if(LoraTime.status == TXSTARTDONE){
+    if(strlen((char*)buf) <= length){
+            BurstWrite(Lora_1278_RegFifo, buf, length);
+            SPIWrite(Lora_1278_RegOpMode,LORA_TX);                    //Tx Mode
+            
+            Wait_Tx_Done();
+            LoraTime.timeTxdone = timer_measure_stop();
+            switch_success = TRUE;
+    }
   }
   return switch_success;
 }
@@ -267,6 +279,7 @@ u8 Wait_Tx_Done(){
                     //SPIRead(LR_RegIrqFlags); //check
                     sx1276_7_8_LoRaClearIrq();                                //Clear irq									
                     switch_success = TRUE;
+                    LoraTime.status = TXDONE;
                     break;
             }
         }		

@@ -11,6 +11,8 @@
 #include "stdlib.h"
 #include "usbd_cdc_if.h"
 LoraMaster myLoraMaster;
+u32 count_success = 0;
+u32 count_total = 0;
 
 /**********************************************************
 **Name:     Send_Broadcast_Data
@@ -72,6 +74,23 @@ void Send_Unicast_Data(){
   myLoraMaster.sent = ALREADY_SENT;
 }
 
+void Send_Unicast_Data_Test(){
+  
+  
+  u8 tx_u[PACKET_LENGTH];
+  u8 Tx_Packet_u[PRINTUSB_LENGTH];
+  myLoraSlave.slave_id = "2";	
+  sprintf((char*)tx_u,"%s", myLoraSlave.slave_id);		
+  sprintf((char*)Tx_Packet_u, "Rxdone: %d, Unicast number: %d\n\n" ,LoraTime.timeRxdone, count_total++);														
+  printUSB((char*)Tx_Packet_u);
+
+  Switch_To_Tx();																											
+  Send_Tx_Packet((u8*)tx_u, PACKET_LENGTH);
+
+  Switch_To_Rx();																			
+  myLoraMode.mode = MASTER_RX;
+}
+
 /**********************************************************
 **Name:     Master_Send_Data
 **Function: Master_Send_Data
@@ -88,6 +107,10 @@ void Master_Send_Data(){
       Send_Unicast_Data();
     }
   }      
+}
+
+void Master_Send_Data_Test(){
+  Send_Unicast_Data_Test();
 }
 
 /**********************************************************
@@ -125,6 +148,15 @@ void Receive_Data(){
   printUSB(myLoraMode.strBuf);	  
 }
 
+void Receive_Data_Test(){
+  myLoraMaster.uni_sent = ALREADY_SENT;                       
+  myLoraPtr.current_ptr++;
+  myLoraSlave.rssi_value = sx1276_7_8_LoRaReadRSSI();	
+  //sprintf(myLoraMode.strBuf,"Txconf: %d, Txdone: %d, Rxconf: %d, RSSI: %d, number: %d\n\n",LoraTime.timeTxconf, LoraTime.timeTxdone, LoraTime.timeRxconf, myLoraSlave.rssi_value, count_success++);	
+  sprintf(myLoraMode.strBuf,"Txconf: %d, Txdone: %d, Rxconf: %d\n\n",LoraTime.timeTxconf, LoraTime.timeTxdone, LoraTime.timeRxconf);
+  printUSB(myLoraMode.strBuf);	  
+}
+
 /**********************************************************
 **Name:     Master_Receive_Data
 **Function: Master_Receive_Data
@@ -138,7 +170,7 @@ void Master_Receive_Data(){
     Start_Timer(callback_function, TIME_OUT);
   }
   if(Indicate_Rx_Packet("10", 0) == 1) //Receive a legal packet
-  {		
+  {
     myLoraMode.flag_timer = TIMER_RESET;
     SW_TIMER_CLEAR(SW_TIMER1);
     
@@ -155,4 +187,28 @@ void Master_Receive_Data(){
       myLoraMode.mode = 7;
     }
   } 
+}
+
+void Master_Receive_Data_Test(){
+  if(myLoraMode.flag_timer == 0){
+    SW_TIMER_CALLBACK callback_function = fun1;
+    myLoraMode.flag_timer = TIMER_SET;
+    Start_Timer(callback_function, TIME_OUT);
+  }
+  if(LoraTime.status == RXSTARTDONE)
+  {
+    if(Indicate_Rx_Packet("10", 0) == 1) //Receive a legal packet
+    {		
+      myLoraMode.flag_timer = TIMER_RESET;
+      SW_TIMER_CLEAR(SW_TIMER1);
+      
+      if(LoraTime.status == GETACK)
+      {
+      Receive_Data_Test();
+      
+      }                               
+      myLoraMode.mode = MASTER_TX;	
+
+    }
+  }
 }

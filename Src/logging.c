@@ -6,31 +6,50 @@
 TxPacket myTxPacket;
 LoraPtr myLoraPtr;
 
-void print_data( char * x, u16 lenx)
+extern TIM_HandleTypeDef htim2; 
+LoraTransmit LoraTime;
+/**
+  * @brief  	Data send over USB with format "numTick:Data\n"
+  * @param  	data, length of data you want to transmit
+  * @retval 	None
+  */
+void print_data(char* data, u8 len_transmit)
 {
-  u8 y[64];
-	u8 k[64];
-	sprintf((char*)k, "%d:",HAL_GetTick());
-	sprintf((char*)y, "%d:%s\n",HAL_GetTick(),x);
-	u16 lenk = strlen((char*)k);
-	u16 leng = lenk + lenx +1 ;
-	CDC_Transmit_FS((uint8_t*)y,(uint16_t)leng);
+        char packet_transmit[64]; // 11+1+48+1 = 61
+        char data_transmit[48];
+        strncpy(data_transmit,data,len_transmit);	 // coppy len_transmit characters from data to data_transmit
+        data_transmit[len_transmit] = '\0';				// gan ky tu null cho vi tri cuoi cua data_transmit
+        sprintf((char*)packet_transmit,"%d:%s\n",HAL_GetTick(),data_transmit);  
+        CDC_Transmit_FS((uint8_t*)packet_transmit,strlen((char*)packet_transmit)); 
 }
-
-u16 timer_measure_start(void)
+/**
+  * @brief  	Start Timer 2
+  * @param  	None
+  * @retval 	None
+  */
+void timer_measure_start(void)
 {
-	u16 time_start =0;
-	time_start = HAL_GetTick();
-	return time_start;
+	HAL_TIM_Base_Start_IT(&htim2);
 }
-
-u16 timer_measure_stop(void)
+/**
+  * @brief  	Stop Timer 2
+  * @param  	None
+  * @retval 	counter in us
+  */
+u32 timer_measure_stop(void)
 {
-	u16 time_stop =0;
-	time_stop = HAL_GetTick();
-	return time_stop;
+	HAL_TIM_Base_Stop_IT(&htim2);
+        u32 count = __HAL_TIM_GET_COUNTER(&htim2);  
+        __HAL_TIM_SET_COUNTER(&htim2,0);
+        return count;
 }
-
+/**
+  * @brief  	Systick callback
+  * @param  	None
+  * @retval 	None
+  */
 void HAL_SYSTICK_Callback(void){
         SW_TIMER_ISR();
 }
+
+

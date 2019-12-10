@@ -17,6 +17,8 @@ typedef struct{
 
 extern LoraMaster myLoraMaster;
 extern void Master_Send_Data();
+extern void Master_Send_Data_Test();
 extern void Master_Receive_Data();
+extern void Master_Receive_Data_Test();
 extern void Send_Unicast_Data();
 extern void Send_Broadcast_Data(char* data);

@@ -14,7 +14,7 @@ LoraMode myLoraMode;
 void mainApp()
 {
 	//u16 i=0;//,j,k=0,g;
-  
+        
 	sx1276_7_8_Reset();
 		
 	/*
@@ -46,25 +46,28 @@ void mainApp()
 		{
 			case SLAVE_TX://lora slave Tx
                         {	
+                          
                           Slave_Send_Response(myLoraMode.uni_or_broad, myLoraSlave.slave_id);
                         }		
 			break;
 				
 			case SLAVE_RX://lora slave Rx continuous
-			{									
+			{	
+                          
                           Slave_Receive_Data(myLoraSlave.slave_id);
+                          
                         }		
 			break;	
                         
                         case MASTER_TX://lora master Tx
                         {	
-                          Master_Send_Data();                    
+                          Master_Send_Data_Test();   
                         }		
 			break;
 				
 			case MASTER_RX://lora master Rx continuous
 			{	                                                   
-                          Master_Receive_Data();                                                      
+                          Master_Receive_Data_Test();     
                         }		
 			break;	
                         

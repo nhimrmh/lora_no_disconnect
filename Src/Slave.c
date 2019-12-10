@@ -48,8 +48,10 @@ void Slave_Send_Response_Unicast(char* slave_id){
   sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, myLoraSlave.rssi_value);		
   sprintf((char*)(myTxPacket.Data), "Data sent: %s", (char*)sx1276_7_8Data);														
   printUSB((char*)(myTxPacket.Data));
+  
   Switch_To_Tx();																											
-  Send_Tx_Packet((u8*)sx1276_7_8Data, PACKET_LENGTH);																								
+  Send_Tx_Packet((u8*)sx1276_7_8Data, PACKET_LENGTH);	
+
   Switch_To_Rx();																			
   myLoraMode.mode = SLAVE_RX;	
 }
@@ -76,7 +78,7 @@ void Slave_Send_Response(u8 uni_or_broad, char* slave_id){
 **Output:   none
 **********************************************************/
 void Slave_Receive_Unicast(){
-  myLoraSlave.rssi_value = sx1276_7_8_LoRaReadRSSI();						
+  myLoraSlave.rssi_value = sx1276_7_8_LoRaReadRSSI();	
   sprintf(myLoraMode.strBuf,"Data received: %s\n",(char*)(RxData + myLoraPtr.current_ptr));		
   myLoraPtr.current_ptr++;
   if(myLoraPtr.current_ptr == LAST_POSITION_OF_QUEUE) myLoraPtr.current_ptr = FIRST_POSITION_OF_QUEUE;

@@ -117,6 +117,7 @@ u8 GET_SW_TIMER_IS_DONE(u8 Timer)
   return done;
 }
 
+/*
 void fun1(void)
 {
   if(myLoraMode.uni_or_broad == 1){
@@ -132,6 +133,13 @@ void fun1(void)
       myLoraMode.mode = 7;
     }
   }
+}
+*/
+
+void fun1(void)
+{
+  myLoraMode.flag_timer = TIMER_RESET;
+  myLoraMode.mode = MASTER_TX;
 }
   
   

@@ -60,7 +60,8 @@ void mainApp()
 			break;	
                         
                         case MASTER_TX://lora master Tx
-                        {	
+                        {
+                          HAL_Delay(800);
                           Master_Send_Data_Test();   
                         }		
 			break;

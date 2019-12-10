@@ -22,3 +22,4 @@ extern void Master_Receive_Data();
 extern void Master_Receive_Data_Test();
 extern void Send_Unicast_Data();
 extern void Send_Broadcast_Data(char* data);
+extern u8 time1;

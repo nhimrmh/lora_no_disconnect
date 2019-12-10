@@ -5,6 +5,7 @@
 #include "SW_Timer.h"
 TxPacket myTxPacket;
 LoraPtr myLoraPtr;
+u8 received_USB[8];
 
 extern TIM_HandleTypeDef htim2; 
 LoraTransmit LoraTime;
@@ -43,6 +44,17 @@ u32 timer_measure_stop(void)
         __HAL_TIM_SET_COUNTER(&htim2,0);
         return count;
 }
+/**
+  * @brief  	GetChar from USB COM
+  * @param  	None
+  * @retval 	String
+  */
+char* GetChar_USB(void)
+{
+  
+  return (char*)received_USB;
+}
+
 /**
   * @brief  	Systick callback
   * @param  	None

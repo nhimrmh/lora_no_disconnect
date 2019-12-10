@@ -13,7 +13,8 @@
 LoraMaster myLoraMaster;
 u32 count_success = 0;
 u32 count_total = 0;
-
+u8 time = 0, time1 = 0;
+u32 packet_count = 0;
 /**********************************************************
 **Name:     Send_Broadcast_Data
 **Function: Send_Broadcast_Data
@@ -43,7 +44,7 @@ void Send_Broadcast_Data(char* data){
 **Input:    data to send in CHAR*
 **Output:   none
 **********************************************************/
-void Send_Unicast_Data(){
+/*void Send_Unicast_Data(){
   u8 tx_u[PACKET_LENGTH];
   u8 Tx_Packet_u[PRINTUSB_LENGTH];
   myLoraMaster.uni_received = NOT_RECEIVED_YET;
@@ -72,21 +73,59 @@ void Send_Unicast_Data(){
   Switch_To_Rx();																			
   myLoraMode.mode = MASTER_RX;
   myLoraMaster.sent = ALREADY_SENT;
+}*/
+
+void Send_Unicast_Data(){
+  u8 tx_u[PACKET_LENGTH];
+  u8 Tx_Packet_u[PRINTUSB_LENGTH];
+  myLoraMaster.uni_received = NOT_RECEIVED_YET;
+  myLoraMaster.uni_sent = NOT_SENT_YET;
+  if(strncmp((char*)received_USB,"1",1) == 0){
+    myLoraSlave.slave_id = "1";
+    myLoraMode.uni_or_broad = UNICAST;
+  }
+  else if(strncmp((char*)received_USB,"2",1) == 0){
+    myLoraSlave.slave_id = "2";
+    myLoraMode.uni_or_broad = UNICAST;
+  }
+  else if(strncmp((char*)received_USB,"3",1) == 0){
+    myLoraSlave.slave_id = "3";
+    myLoraMode.uni_or_broad = UNICAST;
+  }
+  else if(strncmp((char*)received_USB,"4",1) == 0){
+    myLoraSlave.slave_id = "4";
+    myLoraMode.uni_or_broad = UNICAST;
+  }
+  
+  for(u8 i = 0; i <8 ; i++){
+      received_USB[i] = 0;
+  }
+  sprintf((char*)tx_u,"%s", myLoraSlave.slave_id);		
+  sprintf((char*)Tx_Packet_u, "Data sent: Unicast to 1.%s\n\n", (char*)tx_u);														
+  printUSB((char*)Tx_Packet_u);
+  Switch_To_Tx();																											
+  Send_Tx_Packet((u8*)tx_u, PACKET_LENGTH);																								
+  Switch_To_Rx();																			
+  myLoraMode.mode = MASTER_RX;
+  myLoraMaster.sent = ALREADY_SENT;
 }
+
+
 
 void Send_Unicast_Data_Test(){
   
+  time = HAL_GetTick();
   
   u8 tx_u[PACKET_LENGTH];
   u8 Tx_Packet_u[PRINTUSB_LENGTH];
   myLoraSlave.slave_id = "2";	
-  sprintf((char*)tx_u,"%s", myLoraSlave.slave_id);		
+  sprintf((char*)tx_u,"%s_%d", myLoraSlave.slave_id, packet_count++);		
   sprintf((char*)Tx_Packet_u, "Rxdone: %d, Unicast number: %d\n\n" ,LoraTime.timeRxdone, count_total++);														
   printUSB((char*)Tx_Packet_u);
 
   Switch_To_Tx();																											
   Send_Tx_Packet((u8*)tx_u, PACKET_LENGTH);
-
+  
   Switch_To_Rx();																			
   myLoraMode.mode = MASTER_RX;
 }
@@ -97,12 +136,27 @@ void Send_Unicast_Data_Test(){
 **Input:    none
 **Output:   none
 **********************************************************/
-void Master_Send_Data(){
+/*void Master_Send_Data(){
   if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5) == 1){
     Send_Broadcast_Data("abb");
   }
   else if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == 1 || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_7) == 1 
           || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == 1 || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 1){
+    if(myLoraMaster.sent == NOT_SENT_YET){
+      Send_Unicast_Data();
+    }
+  }      
+}*/
+
+void Master_Send_Data(){
+  if(strncmp((char*)received_USB,"broad",5) == 0){
+    for(u8 i = 0; i <8 ; i++){
+        received_USB[i] = 0;
+    }
+    Send_Broadcast_Data("abb");
+  }
+  else if(strncmp((char*)received_USB,"1",1) == 0 || strncmp((char*)received_USB,"2",1) == 0 
+          || strncmp((char*)received_USB,"3",1) == 0 || strncmp((char*)received_USB,"4",1) == 0){
     if(myLoraMaster.sent == NOT_SENT_YET){
       Send_Unicast_Data();
     }
@@ -153,7 +207,7 @@ void Receive_Data_Test(){
   myLoraPtr.current_ptr++;
   myLoraSlave.rssi_value = sx1276_7_8_LoRaReadRSSI();	
   //sprintf(myLoraMode.strBuf,"Txconf: %d, Txdone: %d, Rxconf: %d, RSSI: %d, number: %d\n\n",LoraTime.timeTxconf, LoraTime.timeTxdone, LoraTime.timeRxconf, myLoraSlave.rssi_value, count_success++);	
-  sprintf(myLoraMode.strBuf,"Txconf: %d, Txdone: %d, Rxconf: %d\n\n",LoraTime.timeTxconf, LoraTime.timeTxdone, LoraTime.timeRxconf);
+  sprintf(myLoraMode.strBuf,"Txconf: %d, Txdone: %d, Rxconf: %d, Time1: %d\n\n",LoraTime.timeTxconf, LoraTime.timeTxdone, LoraTime.timeRxconf, time1);
   printUSB(myLoraMode.strBuf);	  
 }
 
@@ -197,8 +251,10 @@ void Master_Receive_Data_Test(){
   }
   if(LoraTime.status == RXSTARTDONE)
   {
+    
     if(Indicate_Rx_Packet("10", 0) == 1) //Receive a legal packet
-    {		
+    {	
+      time1 = HAL_GetTick() - time;
       myLoraMode.flag_timer = TIMER_RESET;
       SW_TIMER_CLEAR(SW_TIMER1);
       

@@ -272,7 +272,7 @@ Bool Send_Tx_Packet(u8* buf, u8 length)
 **********************************************************/
 u8 Wait_Tx_Done(){
         Bool switch_success = FALSE;
-	while(1)
+	/*while(1)
         {
             if(HAL_GPIO_ReadPin(nIrq_GPIO_Port,nIrq_Pin) == 1)       //Packet send over
             {			
@@ -282,7 +282,10 @@ u8 Wait_Tx_Done(){
                     LoraTime.status = TXDONE;
                     break;
             }
-        }		
+        }*/	
+        sx1276_7_8_LoRaClearIrq();                                //Clear irq									
+        switch_success = TRUE;
+        LoraTime.status = TXDONE;	
         return switch_success;
 }
 

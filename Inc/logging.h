@@ -40,6 +40,7 @@ typedef struct
 extern TxPacket myTxPacket;
 extern LoraPtr myLoraPtr;
 extern LoraTransmit LoraTime;
+extern u8 received_USB[8];
 #endif
 
 

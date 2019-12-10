@@ -62,13 +62,13 @@ void mainApp()
                         case MASTER_TX://lora master Tx
                         {
                           HAL_Delay(800);
-                          Master_Send_Data_Test();   
+                          Master_Send_Data();   
                         }		
 			break;
 				
 			case MASTER_RX://lora master Rx continuous
 			{	                                                   
-                          Master_Receive_Data_Test();     
+                          Master_Receive_Data();     
                         }		
 			break;	
                         
@@ -90,10 +90,11 @@ void mainApp()
                         case 6:
                         {
                           if(myLoraMaster.uni_received == 0){
+                            myLoraMode.flag_timer = 0;
                             myLoraMaster.uni_received = 1;
                             sprintf(myLoraMode.strBuf,"Node 1.%s disconnected\n", myLoraSlave.slave_id);				
                             printUSB(myLoraMode.strBuf);	
-                            myLoraMode.mode = 7;
+                            myLoraMode.mode = 3;
                           }
                         }
                         break;

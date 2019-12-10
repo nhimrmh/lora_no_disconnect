@@ -10,6 +10,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "usbd_cdc_if.h"
+
+extern u8 _index;
 LoraMaster myLoraMaster;
 u32 count_success = 0;
 u32 count_total = 0;
@@ -153,11 +155,13 @@ void Master_Send_Data(){
     for(u8 i = 0; i <8 ; i++){
         received_USB[i] = 0;
     }
+    _index  = 0;
     Send_Broadcast_Data("abb");
   }
   else if(strncmp((char*)received_USB,"1",1) == 0 || strncmp((char*)received_USB,"2",1) == 0 
           || strncmp((char*)received_USB,"3",1) == 0 || strncmp((char*)received_USB,"4",1) == 0){
     if(myLoraMaster.sent == NOT_SENT_YET){
+      _index  = 0;
       Send_Unicast_Data();
     }
   }      
@@ -227,7 +231,6 @@ void Master_Receive_Data(){
   {
     myLoraMode.flag_timer = TIMER_RESET;
     SW_TIMER_CLEAR(SW_TIMER1);
-    
     Receive_Data();
                              
     if(myLoraMode.uni_or_broad == 1){
@@ -238,7 +241,8 @@ void Master_Receive_Data(){
     }
     else{       
       SW_TIMER_CLEAR(SW_TIMER1);
-      myLoraMode.mode = 7;
+      myLoraMaster.sent = 0;
+      myLoraMode.mode = 3;
     }
   } 
 }

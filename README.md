@@ -6,10 +6,11 @@
 - IAR Embeded Workbench 8.32.1
 
 # New Update
-- add command from USB COM 
-- improve WaitTxDone 
+- Fix some errors from USB-COM
+- Using WaitTXDone 
+- Adding RTC system to display Real Time for stress test
 - command list:
-	+ "broad" : Broadcast to nodes
+	+ "b" 	  : Broadcast to nodes
 	+ "1"	  : Unicast to node 1.1
 	+ "2"	  : Unicast to node 1.2
 	+ "3"	  : Unicast to node 1.3

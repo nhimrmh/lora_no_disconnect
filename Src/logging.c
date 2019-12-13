@@ -7,8 +7,12 @@ TxPacket myTxPacket;
 LoraPtr myLoraPtr;
 u8 received_USB[8];
 
+extern RTC_TimeTypeDef sTimeUse;
+extern RTC_DateTypeDef DateToUpdateUse;
+extern RTC_HandleTypeDef hrtc;
 extern TIM_HandleTypeDef htim2; 
 LoraTransmit LoraTime;
+LoraCalendar LoraRealTime;
 /**
   * @brief  	Data send over USB with format "numTick:Data\n"
   * @param  	data, length of data you want to transmit
@@ -63,5 +67,22 @@ char* GetChar_USB(void)
 void HAL_SYSTICK_Callback(void){
         SW_TIMER_ISR();
 }
-
-
+/**
+  * @brief  	Display Real Time
+  * @param  	None
+  * @retval 	None
+  */
+void GetRealTime(void)
+{
+  char DateTime_Packet[48];
+  HAL_RTC_GetTime(&hrtc, &sTimeUse, RTC_FORMAT_BIN);
+  HAL_RTC_GetDate(&hrtc, &DateToUpdateUse, RTC_FORMAT_BIN);
+  LoraRealTime.Second = sTimeUse.Seconds;
+  LoraRealTime.Minute = sTimeUse.Minutes;
+  LoraRealTime.Hour = sTimeUse.Hours;
+  LoraRealTime.Day = DateToUpdateUse.Date;
+  LoraRealTime.Month = DateToUpdateUse.Month;
+  LoraRealTime.Year = DateToUpdateUse.Year;
+  sprintf((char*)DateTime_Packet,"%d:%d:%d-%d/%d/%d\n",LoraRealTime.Hour,LoraRealTime.Minute,LoraRealTime.Second,LoraRealTime.Day,LoraRealTime.Month,LoraRealTime.Year );
+  CDC_Transmit_FS((uint8_t*)DateTime_Packet,strlen((char*)DateTime_Packet)); 
+}

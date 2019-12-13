@@ -219,7 +219,7 @@ extern u16 SysTime;
 extern void delay_ms(unsigned int ms);
 extern void delay_us(unsigned int us);
 extern u8 result;
-extern u8 free_ptr;
+
 
 extern u8 Wait_Tx_Done();
 extern void sx1276_7_8_Reset(void);

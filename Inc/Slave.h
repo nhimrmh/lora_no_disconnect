@@ -1,4 +1,4 @@
-#define BROADCAST_DELAY_TIME 100000 * 0.5
+#define BROADCAST_DELAY_TIME 100000/100
 
 typedef struct{
   char* slave_id;  

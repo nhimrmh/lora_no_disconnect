@@ -6,7 +6,7 @@
 extern void print_data(char* data, u8 len_transmit);
 extern void timer_measure_start(void);
 extern u32 timer_measure_stop(void);
-
+extern void GetRealTime(void);
 typedef struct
 {
   u8 Data[20];
@@ -37,9 +37,21 @@ typedef struct
   u16 timeRxdone;  
 }LoraTransmit;
 
+typedef struct
+{
+  u8 Second;
+  u8 Minute;
+  u8 Hour;
+  u8 Day;
+  u8 Month;
+  u8 Year;
+  
+}LoraCalendar;
+
 extern TxPacket myTxPacket;
 extern LoraPtr myLoraPtr;
 extern LoraTransmit LoraTime;
+extern LoraCalendar LoraRealTime;
 extern u8 received_USB[8];
 #endif
 

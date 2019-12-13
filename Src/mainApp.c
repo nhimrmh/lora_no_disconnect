@@ -10,6 +10,13 @@
 #include "usbd_cdc_if.h"
 #include "stdlib.h"
 LoraMode myLoraMode;
+u8 free_ptr = 0;
+u8 store_packet[PACKET_LENGTH];
+u8 store_id[NUMBER_OF_SLAVES];    
+//u8 tx_b[PACKET_LENGTH];
+//u8 Tx_Packet_b[PRINTUSB_LENGTH];
+u8 tx_u[PACKET_LENGTH];
+u8 Tx_Packet_u[PRINTUSB_LENGTH];
 
 void mainApp()
 {
@@ -33,8 +40,8 @@ void mainApp()
         /*
 	Choose mode
 	*/ 
-        myLoraSlave.slave_id = "3"; //Id of slave
-	myLoraMode.mode = SLAVE_RX; //Mode 1: Slave, 3:Master  
+        myLoraSlave.slave_id = "2"; //Id of slave
+	myLoraMode.mode = MASTER_TX; //Mode 1: Slave, 3:Master  
         myLoraMode.uni_or_broad = UNICAST;
 	myLoraMode.slave_count = RESET_VALUE;
         myLoraPtr.current_ptr = RESET_VALUE;
@@ -61,7 +68,7 @@ void mainApp()
                         
                         case MASTER_TX://lora master Tx
                         {
-                          HAL_Delay(800);
+                          //HAL_Delay(1200);
                           Master_Send_Data();   
                         }		
 			break;
@@ -89,13 +96,13 @@ void mainApp()
                         
                         case 6:
                         {
-                          if(myLoraMaster.uni_received == 0){
-                            myLoraMode.flag_timer = 0;
-                            myLoraMaster.uni_received = 1;
+                          //if(myLoraMaster.uni_received == 0){
+
+                            //myLoraMaster.uni_received = 1;
                             sprintf(myLoraMode.strBuf,"Node 1.%s disconnected\n", myLoraSlave.slave_id);				
                             printUSB(myLoraMode.strBuf);	
                             myLoraMode.mode = 3;
-                          }
+                          //}
                         }
                         break;
                         

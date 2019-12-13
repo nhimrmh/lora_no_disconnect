@@ -28,7 +28,10 @@ void Delay_By_Id(char* slave_id){
 **Output:   none
 **********************************************************/
 void Slave_Send_Response_Broadcast(char* slave_id){
-  Delay_By_Id(slave_id);                            			
+  Delay_By_Id(slave_id);                           
+  for(u8 i = 1; i <PACKET_LENGTH ; i++){
+        sx1276_7_8Data[i] = 0;
+  }
   sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, myLoraSlave.rssi_value);		
   sprintf((char*)(myTxPacket.Data), "Data sent: %s", (char*)sx1276_7_8Data);														
   printUSB((char*)(myTxPacket.Data));
@@ -44,7 +47,10 @@ void Slave_Send_Response_Broadcast(char* slave_id){
 **Input:    slave id to send data
 **Output:   none
 **********************************************************/
-void Slave_Send_Response_Unicast(char* slave_id){  			
+void Slave_Send_Response_Unicast(char* slave_id){  	
+  for(u8 i = 1; i <PACKET_LENGTH ; i++){
+        sx1276_7_8Data[i] = 0;
+  }
   sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, myLoraSlave.rssi_value);		
   sprintf((char*)(myTxPacket.Data), "Data sent: %s", (char*)sx1276_7_8Data);														
   printUSB((char*)(myTxPacket.Data));

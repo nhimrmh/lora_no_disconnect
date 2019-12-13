@@ -120,21 +120,23 @@ u8 GET_SW_TIMER_IS_DONE(u8 Timer)
 
 void fun1(void)
 {
+  myLoraMode.flag_timer = 0;
+
   if(myLoraMode.uni_or_broad == 1){
     myLoraMode.slave_count = 0;
-    myLoraMode.flag_timer = 0;
+
     myLoraMode.mode = 5;	
   }
   else{
-    if(myLoraMaster.uni_sent == 0){
-      myLoraMaster.sent = 0;
+    //if(myLoraMaster.uni_sent == 0){
+     // myLoraMaster.sent = 0;
       myLoraMode.mode = 6;
-    }
-    else{
-      myLoraMode.flag_timer = 0;
-      myLoraMaster.sent = 0;
-      myLoraMode.mode = 3;
-    }
+   // }
+    //else{
+      //myLoraMode.flag_timer = 0;
+      //myLoraMaster.sent = 0;
+     // myLoraMode.mode = 3;
+    //}
   }
 }
 

@@ -6,6 +6,7 @@
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "My_type.h"
+#include "mainApp.h"
 #define printUSB(x) CDC_Transmit_FS((uint8_t*)x,strlen((char*)x))
 extern uint32_t tick_temp;
 Lora_HandleTypeDef Lora;

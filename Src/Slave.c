@@ -10,7 +10,7 @@
 #include "Master.h"
 
 LoraSlave myLoraSlave;
-
+u32 count_reponse = 0;
 /**********************************************************
 **Name:     Delay_By_Id
 **Function: Delay_By_Id
@@ -51,8 +51,8 @@ void Slave_Send_Response_Unicast(char* slave_id){
   for(u8 i = 1; i <PACKET_LENGTH ; i++){
         sx1276_7_8Data[i] = 0;
   }
-  sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, myLoraSlave.rssi_value);		
-  sprintf((char*)(myTxPacket.Data), "Data sent: %s", (char*)sx1276_7_8Data);														
+  sprintf((char*)sx1276_7_8Data,"%s_%d", slave_id, myLoraSlave.rssi_value);		
+  sprintf((char*)(myTxPacket.Data), "Data sent: %s, count: %d\n", (char*)sx1276_7_8Data, ++count_reponse);														
   printUSB((char*)(myTxPacket.Data));
   
   Switch_To_Tx();																											

@@ -40,7 +40,7 @@ void Send_Broadcast_Data(char* data){
   u8 Tx_Packet_b[PRINTUSB_LENGTH];
   HAL_Delay(TIME_BETWEEN_DATA_SENT);                            			
   sprintf((char*)tx_b,"%s_%d\n", data, broad_count++);	
-  GetRealTime();
+  //GetRealTime();
   sprintf((char*)Tx_Packet_b, "Data sent: all, %d\n ", broad_count);														
   printUSB((char*)Tx_Packet_b);
   Switch_To_Tx();																											
@@ -86,8 +86,8 @@ void Send_Unicast_Data(){
   for(u8 i = 0; i <8 ; i++){
       received_USB[i] = 0;
   }
-  sprintf((char*)tx_u,"%s", myLoraSlave.slave_id);		
-  sprintf((char*)Tx_Packet_u, "Data sent: Unicast to 1.%s\n", (char*)tx_u);														
+  sprintf((char*)tx_u,"%s_%d", myLoraSlave.slave_id, count_total++);		
+  sprintf((char*)Tx_Packet_u, "Unicast to 1.%s, count: %d\n", (char*)tx_u, count_total);														
   printUSB((char*)Tx_Packet_u);
   Switch_To_Tx();																											
   Send_Tx_Packet((u8*)tx_u, PACKET_LENGTH);																								
@@ -141,18 +141,24 @@ void Receive_Data(){
   }                   
   for(uint32_t i = 0; i < NUMBER_OF_SLAVES - 1; i++){
           store_id[i] = 0;
-  }
+  } 
   strncpy((char*)store_id,(char*)(RxData + myLoraPtr.current_ptr),1);
+
   if(atoi((char*)store_id) > 0)
   {
     myLoraMaster.status[atoi((char*)store_id)] = 1;
   }
+
+  ////////////////////////////////////////////////////////////////////
+  myLoraMaster.status[atoi((char*)store_id)] = 1;
+  ////////////////////////////////////////////////////////////////////
+
   strcpy((char*)store_packet, (char*)(RxData + myLoraPtr.current_ptr));
   myLoraPtr.current_ptr++;
   if(myLoraPtr.current_ptr == LAST_POSITION_OF_QUEUE) myLoraPtr.current_ptr = FIRST_POSITION_OF_QUEUE;
   myLoraMode.slave_count++;
   myLoraSlave.rssi_value = sx1276_7_8_LoRaReadRSSI();	
-  sprintf(myLoraMode.strBuf,"Node 1.%s connected with RSSI: %d\n", (char*)store_id, myLoraSlave.rssi_value);				
+  sprintf(myLoraMode.strBuf,"Node 1.%s - RSSI: %d, count: %d\n", (char*)store_id, myLoraSlave.rssi_value, ++count_success);				
   printUSB(myLoraMode.strBuf);	  
 }
 

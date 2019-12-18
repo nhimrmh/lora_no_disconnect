@@ -338,10 +338,7 @@ static void MX_RTC_Init(void)
   hrtc.Instance = RTC;
   hrtc.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
   hrtc.Init.OutPut = RTC_OUTPUTSOURCE_ALARM;
-  if (HAL_RTC_Init(&hrtc) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  
 
   /* USER CODE BEGIN Check_RTC_BKUP */
     
@@ -353,19 +350,11 @@ static void MX_RTC_Init(void)
   sTime.Minutes = 0x15;
   sTime.Seconds = 0x0;
 
-  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
-  {
-    Error_Handler();
-  }
   DateToUpdate.WeekDay = RTC_WEEKDAY_FRIDAY;
   DateToUpdate.Month = RTC_MONTH_DECEMBER;
   DateToUpdate.Date = 0x13;
   DateToUpdate.Year = 0x19;
 
-  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
-  {
-    Error_Handler();
-  }
   /* USER CODE BEGIN RTC_Init 2 */
 
   /* USER CODE END RTC_Init 2 */

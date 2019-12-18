@@ -8,6 +8,8 @@
 #include "main.h"
 #include "mainApp.h"
 #include "Master.h"
+#include "Slave.h"
+#include "Lora_transmission_HAL.h"
 
 typedef struct
 {
@@ -122,7 +124,7 @@ void fun1(void)
 {
   myLoraMode.flag_timer = 0;
 
-  if(myLoraMode.uni_or_broad == 1){
+  if(myLoraSlave.slave_mode == 1){
     myLoraMode.slave_count = 0;
 
     myLoraMode.mode = 5;	
@@ -141,12 +143,15 @@ void fun1(void)
 }
 
 
-/*void fun1(void)
+/**********************************************************
+**Name:     fun2
+**Function: Function callback for Timeout - Master
+**Input:    None
+**Output:   None
+**********************************************************/
+void fun2(void)
 {
-  myLoraMode.flag_timer = TIMER_RESET;
-  myLoraMode.mode = MASTER_TX;
-}*/
-  
-  
+  myLoraMode.mode = 8;
+}
 
 

@@ -53,6 +53,8 @@ extern LoraPtr myLoraPtr;
 extern LoraTransmit LoraTime;
 extern LoraCalendar LoraRealTime;
 extern u8 received_USB[8];
+extern char* substring(char* source, u8 start, u8 end);
+extern u8 indexOf(char* source, char* character);
 #endif
 
 

@@ -21,7 +21,6 @@ void mainApp(void);
 
 typedef struct{
   u8 mode;
-  u8 uni_or_broad;
   u8 slave_count;
   char strBuf[128];
   u8 flag_timer;

@@ -199,6 +199,24 @@ Bool Read_Rx_Packet(char* Rx_Packet, u8 length, char* slave_id, u8 m_or_s){
             if(free_ptr == 3) free_ptr = 0;
             receive_success = TRUE;
       }
+      else if(strncmp((char*)temp,"T",1) == 0 || m_or_s == 0){
+            strcpy(*(RxData + free_ptr),(char*)temp);	
+            free_ptr++;
+            if(free_ptr == 3) free_ptr = 0;
+            receive_success = TRUE;
+      }
+      else if(strncmp((char*)temp,"S",1) == 0 || m_or_s == 0){
+            strcpy(*(RxData + free_ptr),(char*)temp);	
+            free_ptr++;
+            if(free_ptr == 3) free_ptr = 0;
+            receive_success = TRUE;
+      }
+      else if(strncmp((char*)temp,"D",1) == 0 || m_or_s == 0){
+            strcpy(*(RxData + free_ptr),(char*)temp);	
+            free_ptr++;
+            if(free_ptr == 3) free_ptr = 0;
+            receive_success = TRUE;
+      }
     }
     else{
             receive_success = FALSE;

@@ -1,5 +1,5 @@
 #include "My_type.h"
-
+#define DELAY_TIME 100000
 
 typedef void (*SW_TIMER_CALLBACK)(void);
 
@@ -21,3 +21,4 @@ extern u16 GET_SW_TIMER_COUNTER(u8 Timer);
 extern u8 GET_SW_TIMER_IS_RUNNING(u8 Timer);
 extern u8 GET_SW_TIMER_IS_DONE(u8 Timer);
 extern void fun1(void);
+extern void fun2(void);

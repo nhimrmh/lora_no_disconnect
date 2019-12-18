@@ -10,6 +10,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "usbd_cdc_if.h"
+#include "My_type.h"
 
 extern u8 _index;
 extern u8 store_packet[PACKET_LENGTH];
@@ -24,6 +25,9 @@ u32 count_total = 0;
 u8 time = 0, time1 = 0;
 u32 packet_count = 0;
 u32 broad_count = 0;
+u32 TIME_OUT = 0;
+u8 delay_position;
+SW_TIMER_CALLBACK callback_function;
 //u32 broadcast_count = 0;
 /**********************************************************
 **Name:     Send_Broadcast_Data
@@ -31,25 +35,38 @@ u32 broad_count = 0;
 **Input:    data to send in CHAR*
 **Output:   none
 **********************************************************/
-void Send_Broadcast_Data(char* data){  
-  /*for(u8 i = 1; i <PACKET_LENGTH ; i++){
-        tx_b[i] = 0;
-        //Tx_Packet_b[i] = 0;
-  }*/
+void Send_Broadcast_Data(char* data){ 
+  if(strncmp(myLoraSlave.slave_id, "0", 1) == 0){
+    
+  }
+  else{    
+    HAL_Delay(myLoraSlave.slave_delay);
+  }
+  
   u8 tx_b[PACKET_LENGTH];
   u8 Tx_Packet_b[PRINTUSB_LENGTH];
-  HAL_Delay(TIME_BETWEEN_DATA_SENT);                            			
-  sprintf((char*)tx_b,"%s_%d\n", data, broad_count++);	
+  HAL_Delay(TIME_BETWEEN_DATA_SENT);  
+  if(strncmp(data, "a",1) == 0){
+    sprintf((char*)tx_b,"%s_%d\n", data, myLoraMaster.broad_count);	
+    sprintf((char*)Tx_Packet_b, "Data sent: %s, %d\n ",data, myLoraMaster.broad_count++);
+  }
+  else if(strncmp(data, "T",1) == 0){
+    delay_position = 0;
+    sprintf((char*)tx_b,"%s_%d\n", data, myLoraMaster.delay_count);	
+    sprintf((char*)Tx_Packet_b, "Data sent: %s, %d\n ",data, myLoraMaster.delay_count);
+  }
   //GetRealTime();
-  sprintf((char*)Tx_Packet_b, "Data sent: all, %d\n ", broad_count);														
+  
   printUSB((char*)Tx_Packet_b);
   Switch_To_Tx();																											
   Send_Tx_Packet((u8*)tx_b, PACKET_LENGTH);																								
   Switch_To_Rx();																			
   myLoraMode.mode = MASTER_RX;	
-  myLoraMode.uni_or_broad = BROADCAST;
-  for(u8 i = 1; i < 100; i++){
-        myLoraMaster.status[i] = 0;
+  myLoraSlave.slave_mode = BROADCAST;
+  if(myLoraMaster.mode == 0){
+    for(u8 i = 1; i < 100; i++){
+          myLoraMaster.status[i] = 0;
+    }
   }
 }
 
@@ -68,19 +85,19 @@ void Send_Unicast_Data(){
   }
   if(strncmp((char*)received_USB,"1",1) == 0){
     myLoraSlave.slave_id = "1";
-    myLoraMode.uni_or_broad = UNICAST;
+    myLoraSlave.slave_mode = UNICAST;
   }
   else if(strncmp((char*)received_USB,"2",1) == 0){
     myLoraSlave.slave_id = "2";
-    myLoraMode.uni_or_broad = UNICAST;
+    myLoraSlave.slave_mode = UNICAST;
   }
   else if(strncmp((char*)received_USB,"3",1) == 0){
     myLoraSlave.slave_id = "3";
-    myLoraMode.uni_or_broad = UNICAST;
+    myLoraSlave.slave_mode = UNICAST;
   }
   else if(strncmp((char*)received_USB,"4",1) == 0){
     myLoraSlave.slave_id = "4";
-    myLoraMode.uni_or_broad = UNICAST;
+    myLoraSlave.slave_mode = UNICAST;
   }
   
   for(u8 i = 0; i <8 ; i++){
@@ -103,9 +120,16 @@ void Send_Unicast_Data(){
 **Output:   none
 **********************************************************/
 
-void Master_Send_Data(){
+void Master_Send_Data(){										  
   if(strncmp((char*)received_USB,"b",1) == 0){
     Send_Broadcast_Data("abb");
+  }
+  else if(strncmp((char*)received_USB,"t",1) == 0){    
+    for(u8 i = 0; i <8 ; i++){
+        received_USB[i] = 0;
+    }
+    Send_Broadcast_Data("T");
+    myLoraMaster.mode = 1;
   }
   else if(strncmp((char*)received_USB,"1",1) == 0 || strncmp((char*)received_USB,"2",1) == 0 
           || strncmp((char*)received_USB,"3",1) == 0 || strncmp((char*)received_USB,"4",1) == 0){
@@ -149,10 +173,6 @@ void Receive_Data(){
     myLoraMaster.status[atoi((char*)store_id)] = 1;
   }
 
-  ////////////////////////////////////////////////////////////////////
-  myLoraMaster.status[atoi((char*)store_id)] = 1;
-  ////////////////////////////////////////////////////////////////////
-
   strcpy((char*)store_packet, (char*)(RxData + myLoraPtr.current_ptr));
   myLoraPtr.current_ptr++;
   if(myLoraPtr.current_ptr == LAST_POSITION_OF_QUEUE) myLoraPtr.current_ptr = FIRST_POSITION_OF_QUEUE;
@@ -163,33 +183,64 @@ void Receive_Data(){
 }
 
 /**********************************************************
+**Name:     Receive_Data_Delay
+**Function: Receive_Data_Delay
+**Input:    none
+**Output:   none
+**********************************************************/
+void Receive_Data_Delay(void){
+    strcpy((char*)store_packet, (char*)(RxData + myLoraPtr.current_ptr));
+    myLoraPtr.current_ptr++;
+    if(myLoraPtr.current_ptr == LAST_POSITION_OF_QUEUE) myLoraPtr.current_ptr = FIRST_POSITION_OF_QUEUE;
+    myLoraMaster.delay[delay_position] = atoi(substring((char*)store_packet, POSITION_START, strlen((char*)store_packet) - 1));
+    delay_position++;
+}
+
+/**********************************************************
 **Name:     Master_Receive_Data
 **Function: Master_Receive_Data
 **Input:    none
 **Output:   none
 **********************************************************/
 void Master_Receive_Data(){
-  if(myLoraMode.flag_timer == 0){
-    SW_TIMER_CALLBACK callback_function = fun1;
+    if(myLoraMode.flag_timer == TIMER_RESET){
+    if(myLoraMaster.mode == 0){
+      callback_function = fun1;
+      TIME_OUT = 300000;
+    }
+    else if(myLoraMaster.mode == 1){
+      callback_function = fun2;
+      TIME_OUT = 500000;
+    }
+    else{
+      callback_function = fun1;
+      TIME_OUT = 300000;
+    }
     myLoraMode.flag_timer = TIMER_SET;
     Start_Timer(callback_function, TIME_OUT);
   }
   if(Indicate_Rx_Packet("10", 0) == 1) //Receive a legal packet
   {
-    myLoraMode.flag_timer = TIMER_RESET;
-    SW_TIMER_CLEAR(SW_TIMER1);
-    Receive_Data();
-                             
-    if(myLoraMode.uni_or_broad == 1){
-      if(myLoraMode.slave_count == 7){
-        myLoraMode.mode = MASTER_TX;	
-        myLoraMode.slave_count = 0;
+    if(strncmp((char*)(RxData + myLoraPtr.current_ptr),"R",1) == 0){
+      myLoraMode.flag_timer = TIMER_RESET;
+      SW_TIMER_CLEAR(SW_TIMER1);
+      Receive_Data_Delay();               
+    }
+    else{
+      myLoraMode.flag_timer = TIMER_RESET;
+      SW_TIMER_CLEAR(SW_TIMER1);
+      Receive_Data();
+                               
+      if(myLoraSlave.slave_mode == BROADCAST){
+        if(myLoraMode.slave_count == 7){
+          myLoraMode.mode = MASTER_TX;	
+          myLoraMode.slave_count = 0;
+        }
+      }
+      else{       
+        SW_TIMER_CLEAR(SW_TIMER1);
+        myLoraMode.mode = MASTER_TX;
       }
     }
-    else{       
-      SW_TIMER_CLEAR(SW_TIMER1);
-      myLoraMaster.sent = 0;
-      myLoraMode.mode = 3;
-    }
-  } 
+  }
 }

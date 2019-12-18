@@ -6,7 +6,7 @@
 TxPacket myTxPacket;
 LoraPtr myLoraPtr;
 u8 received_USB[8];
-
+u8 destination[20];
 extern RTC_TimeTypeDef sTimeUse;
 extern RTC_DateTypeDef DateToUpdateUse;
 extern RTC_HandleTypeDef hrtc;
@@ -67,22 +67,36 @@ char* GetChar_USB(void)
 void HAL_SYSTICK_Callback(void){
         SW_TIMER_ISR();
 }
+
 /**
-  * @brief  	Display Real Time
-  * @param  	None
-  * @retval 	None
+  * @brief  	substring
+  * @param  	source string, start, end
+  * @retval     substring from start to end
   */
-void GetRealTime(void)
+char* substring(char* source, u8 start, u8 end)
+{  
+  memset(destination, '\0', sizeof(destination));
+  strncpy((char*)destination, source + start, end - start + 1);
+  return ((char*)destination);
+}
+/**
+  * @brief  	indexOf
+  * @param  	source string , chacracter
+  * @retval 	position of character - start from 0 **note: do not search string just char
+  */
+u8 indexOf(char* source, char* character)
 {
-  char DateTime_Packet[48];
-  HAL_RTC_GetTime(&hrtc, &sTimeUse, RTC_FORMAT_BIN);
-  HAL_RTC_GetDate(&hrtc, &DateToUpdateUse, RTC_FORMAT_BIN);
-  LoraRealTime.Second = sTimeUse.Seconds;
-  LoraRealTime.Minute = sTimeUse.Minutes;
-  LoraRealTime.Hour = sTimeUse.Hours;
-  LoraRealTime.Day = DateToUpdateUse.Date;
-  LoraRealTime.Month = DateToUpdateUse.Month;
-  LoraRealTime.Year = DateToUpdateUse.Year;
-  sprintf((char*)DateTime_Packet,"%d:%d:%d-%d/%d/%d\n",LoraRealTime.Hour,LoraRealTime.Minute,LoraRealTime.Second,LoraRealTime.Day,LoraRealTime.Month,LoraRealTime.Year );
-  CDC_Transmit_FS((uint8_t*)DateTime_Packet,strlen((char*)DateTime_Packet)); 
+  u8 pos;
+  pos = strcspn(source,character);
+  return pos;
+}
+/**
+  * @brief  	getsubstring
+  * @param  	source string, 
+  * @retval 	substring start from substring to the end of source.
+  */
+char* getsubstring(char* source, char* substring)
+{
+  
+  return (strstr(source,substring));
 }

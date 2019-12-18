@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "D:\LoraFastest\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" --backend -f "D:\LoraFastest\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "D:\Lora_Backup\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" --backend -f "D:\Lora_Backup\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "D:\LoraFastest\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" "--debug_file=%~1" --backend -f "D:\LoraFastest\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "D:\Lora_Backup\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" "--debug_file=%~1" --backend -f "D:\Lora_Backup\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
 
 @echo off 
 :end

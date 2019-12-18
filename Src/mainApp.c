@@ -11,6 +11,8 @@
 #include "stdlib.h"
 LoraMode myLoraMode;
 u8 free_ptr = 0;
+
+u8 Tx_Packet_delay[100];
 u8 store_packet[PACKET_LENGTH];
 u8 store_id[NUMBER_OF_SLAVES];    
 //u8 tx_b[PACKET_LENGTH];
@@ -40,13 +42,19 @@ void mainApp()
         /*
 	Choose mode
 	*/ 
-        myLoraSlave.slave_id = "2"; //Id of slave
-	myLoraMode.mode = MASTER_TX; //Mode 1: Slave, 3:Master  
-        myLoraMode.uni_or_broad = UNICAST;
+        myLoraSlave.slave_id = "3"; //Id of slave
+	myLoraMode.mode = SLAVE_RX; //Mode 1: Slave, 3:Master  
+        //myLoraMode.mode = MASTER_TX;
+        myLoraSlave.slave_mode = UNICAST;
 	myLoraMode.slave_count = RESET_VALUE;
         myLoraPtr.current_ptr = RESET_VALUE;
         myLoraMode.flag_timer = TIMER_RESET;
         myLoraMaster.sent = NOT_SENT_YET;
+        myLoraSlave.receive_T = 0;
+        myLoraSlave.receive_S = 0;
+        myLoraMaster.delay_count = 0;
+        myLoraMaster.broad_count = 0;        
+        
 	while (1)
 	{		
 		switch(myLoraMode.mode)
@@ -54,7 +62,7 @@ void mainApp()
 			case SLAVE_TX://lora slave Tx
                         {	
                           
-                          Slave_Send_Response(myLoraMode.uni_or_broad, myLoraSlave.slave_id);
+                          Slave_Send_Response(myLoraSlave.slave_mode, myLoraSlave.slave_id);
                         }		
 			break;
 				
@@ -136,6 +144,40 @@ void mainApp()
                             }
                           }
                         break;
+                        
+                case 8:
+                  {
+                    u8 done_packet[20];
+                    u8 temp_print[50];
+                    myLoraMode.flag_timer = TIMER_RESET;
+                    SW_TIMER_CLEAR(SW_TIMER1);
+                    
+                    for(u8 idx = 0; idx < delay_position; idx++){  
+                      Switch_To_Tx();
+                      u8 tx_delay[PACKET_LENGTH];
+                      sprintf((char*)tx_delay,"S%s_%d&%d", myLoraSlave.slave_id, (idx + 1)*DELAY_TIME, myLoraMaster.delay[idx]);
+                      Send_Tx_Packet((u8*)tx_delay, PACKET_LENGTH);		                                                
+                      sprintf((char*)temp_print,"Set delay: %s\n", (char*)tx_delay);
+                      printUSB((char*)temp_print); 
+                      HAL_Delay(100000);
+                      //sprintf((char*)Tx_Packet_delay, "Set delay 1 second to 1.1\n");														
+                      //sprintf((char*)Tx_Packet_delay, "Set delay %d second to 1.%d\n", (idx + 1)*(DELAY_TIME/100000), myLoraMaster.delay[idx]);														
+                      //printUSB((char*)Tx_Packet_delay);    																										                      
+                    }
+                    Switch_To_Tx();   
+                    myLoraSlave.receive_T = 0;
+                    myLoraSlave.receive_S = 0;
+                    HAL_Delay(300000);
+                    sprintf((char*)done_packet, "D_%d", myLoraMaster.delay_count++);
+                    Send_Tx_Packet((u8*)done_packet, PACKET_LENGTH);	
+                    printUSB((char*)done_packet);    																										
+                    if(strncmp(myLoraSlave.slave_id, "0", 1) == 0) myLoraMode.mode = MASTER_TX;
+                    else {
+                      myLoraMode.mode = SLAVE_RX;
+                      Switch_To_Rx();	
+                    }
+                  }
+                  break;
 	}
       }
 }
